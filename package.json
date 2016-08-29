@@ -2,7 +2,10 @@
   "name": "pokemon",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "engines": {
+    "node": "6.4.0"
+  },
+  "main": "chatemallbot.js",
   "dependencies": {
     "moment": "^2.14.1",
     "telegram-node-bot": "^3.0.12",
