@@ -1,0 +1,26 @@
+{
+  "name": "pokemon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "moment": "^2.14.1",
+    "telegram-node-bot": "^3.0.12",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node chatemallbot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jianqi/catchthemall.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jianqi/catchthemall/issues"
+  },
+  "homepage": "https://github.com/jianqi/catchthemall#readme"
+}
