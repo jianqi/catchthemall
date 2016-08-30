@@ -2,7 +2,7 @@
 'use strict'
 const Telegram = require('telegram-node-bot')
 const TelegramBaseController = Telegram.TelegramBaseController
-const tg = new Telegram.Telegram('246385012:AAHjqmkB4PzEAhpufTxtDU1Ny6t_VkJ5AaY')
+const tg = new Telegram.Telegram(process.env.TELEGRAM_API_TOKEN)
 var word = 'test';
 var timerobj;
 var http = require('http');
