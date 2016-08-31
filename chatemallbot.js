@@ -37,7 +37,7 @@ var sentList = [];
 // 0.005 degree = 555m
 
 function handleData(response){
-	console.log(geoloc + ' - received response at : ' + new Date());
+	console.log(options.path + ' - received response at : ' + new Date());
 	var str = '';
 	//another chunk of data has been recieved, so append it to `str`
   response.on('data', function (chunk) {
@@ -89,7 +89,7 @@ function setLocation(lat, lon){
 	var minLongitude = longi - range;
 	var maxLongitude = longi + range;
 	geoloc = 'minLatitude='+minLatitude.toFixed(6)+'&maxLatitude='+maxLatitude.toFixed(6)+'&minLongitude='+minLongitude.toFixed(6)+'&maxLongitude='+maxLongitude.toFixed(6);
-	
+	options.path = '/api/v1/submissions?'+geoloc;
 }
 
 //setInterval( catchthemall, 1000*60*3);
@@ -130,10 +130,12 @@ class PingController extends TelegramBaseController {
 		switch(favPlace){
 			case "cck":
 				geoloc = cckloc;
+				options.path = '/api/v1/submissions?'+geoloc;
 				$.sendMessage('Location set to CCK');
 				break;
 			case "bmc":
 				geoloc = bmcloc;
+				options.path = '/api/v1/submissions?'+geoloc;
 				$.sendMessage('Location set to BMC');				
 				break;
 			default:
