@@ -6,7 +6,7 @@ var timerobj;
 var http = require('http');
 var _ = require('underscore');
 var fs = require('fs');
-var moment = require('moment');
+var moment = require('moment-timezone');
 var chatId = '';
 var POKEDEX = JSON.parse(fs.readFileSync('pokemon.txt','utf8'));
 
@@ -35,7 +35,7 @@ var sentList = [];
 // 0.005 degree = 555m
 
 function handleData(response){
-	console.log(options.path + ' - received response at : ' + (new Date())+ (1000*60*60*8) );
+	console.log(options.path + ' - received response at : ' + moment().tz("Asia/Singapore").format('LTS') );
 	var str = '';
 	//another chunk of data has been recieved, so append it to `str`
   response.on('data', function (chunk) {
@@ -60,7 +60,7 @@ function handleData(response){
 	
 	_.each(removedNoise, function(pokemon){		
 		sentList.push(pokemon.id);
-		var time = moment(new Date(Number(pokemon.created+"000")+(1000 * 60 * 15) + (1000*60*60*8))).format('hh:mm:ss');		
+		var time = moment.unix(Number(pokemon.created)).tz('Asia/Singapore').add(15,'m').format('LTS');		
 		var googlelocation = 'https://www.google.com.sg/maps/place/'+pokemon.latitude+','+pokemon.longitude;
 		tg.api.sendMessage(chatId,POKEDEX[Number(pokemon.pokemonId)-1].name + " at " +googlelocation+" until "+ time );
 	});
