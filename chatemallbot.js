@@ -28,14 +28,14 @@ var options = {
   path: '/api/v1/submissions?'+geoloc,
   method:'GET'
 };
-var rarePokemon = [2,3,4,5,6,8,9,26,31,34,36,38,40,45,51,53,57,59,62,64,65,67,68,71,75,76,78,82,86,87,89,91,93,94,95,97,101,103,106,107,112,113,131,134,135,136,137,140,141,142,143,148,149];
+var rarePokemon = [2,3,5,6,8,9,26,31,34,36,38,40,45,51,53,57,59,62,64,65,67,68,71,75,76,78,82,86,87,89,91,93,94,95,97,101,103,106,107,112,113,131,134,135,136,137,140,141,142,143,148,149];
 rarePokemon = _.sortBy(rarePokemon, function(num) {return num;});
 var commonPokemon = [16,17,19,20,13,14,10,11,21,23,29,32,41,46,48,69,72,79,84,98,129,116,120];
 var sentList = [];
 // 0.005 degree = 555m
 
 function handleData(response){
-	console.log(options.path + ' - received response at : ' + new Date());
+	console.log(options.path + ' - received response at : ' + (new Date())+ (1000*60*60*8) );
 	var str = '';
 	//another chunk of data has been recieved, so append it to `str`
   response.on('data', function (chunk) {
@@ -60,7 +60,7 @@ function handleData(response){
 	
 	_.each(removedNoise, function(pokemon){		
 		sentList.push(pokemon.id);
-		var time = moment(new Date(Number(pokemon.created+"000")+(1000 * 60 * 15))).format('hh:mm:ss');		
+		var time = moment(new Date(Number(pokemon.created+"000")+(1000 * 60 * 15) + (1000*60*60*8))).format('hh:mm:ss');		
 		var googlelocation = 'https://www.google.com.sg/maps/place/'+pokemon.latitude+','+pokemon.longitude;
 		tg.api.sendMessage(chatId,POKEDEX[Number(pokemon.pokemonId)-1].name + " at " +googlelocation+" until "+ time );
 	});
