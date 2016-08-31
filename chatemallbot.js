@@ -20,9 +20,9 @@ var POKEDEX = JSON.parse(fs.readFileSync('pokemon.txt','utf8'));
 //var geoloc = 'minLatitude=1.379938212500962&maxLatitude=1.3989012175086133&minLongitude=103.72072219848633&maxLongitude=103.76964569091797';
 
 var cckloc = 'minLatitude=1.381397&maxLatitude=1.396885&minLongitude=103.739545&maxLongitude=103.753460';
-var bmcloc = 'minLatitude=1.283287&maxLatitude=1.284551&minLongitude=103.813580&maxLongitude=103.820331';
+var bmcloc = 'minLatitude=1.281957&maxLatitude=1.284551&minLongitude=103.813580&maxLongitude=103.820331';
 
-var geoloc = cckloc;
+var geoloc = bmcloc;
 var range = 0.005;
 
 var options = {
