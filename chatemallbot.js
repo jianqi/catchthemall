@@ -1,9 +1,7 @@
-
 'use strict'
 const Telegram = require('telegram-node-bot')
 const TelegramBaseController = Telegram.TelegramBaseController
 const tg = new Telegram.Telegram(process.env.TELEGRAM_API_TOKEN)
-var word = 'test';
 var timerobj;
 var http = require('http');
 var _ = require('underscore');
@@ -20,9 +18,9 @@ var POKEDEX = JSON.parse(fs.readFileSync('pokemon.txt','utf8'));
 //var geoloc = 'minLatitude=1.379938212500962&maxLatitude=1.3989012175086133&minLongitude=103.72072219848633&maxLongitude=103.76964569091797';
 
 var cckloc = 'minLatitude=1.381397&maxLatitude=1.396885&minLongitude=103.739545&maxLongitude=103.753460';
-var bmcloc = 'minLatitude=1.283287&maxLatitude=1.284551&minLongitude=103.813580&maxLongitude=103.820331';
+var bmcloc = 'minLatitude=1.281957&maxLatitude=1.284551&minLongitude=103.813580&maxLongitude=103.820331';
 
-var geoloc = cckloc;
+var geoloc = bmcloc;
 var range = 0.005;
 
 var options = {
@@ -37,7 +35,7 @@ var sentList = [];
 // 0.005 degree = 555m
 
 function handleData(response){
-	console.log(geoloc + ' - received response at : ' + new Date());
+	console.log(options.path + ' - received response at : ' + new Date());
 	var str = '';
 	//another chunk of data has been recieved, so append it to `str`
   response.on('data', function (chunk) {
@@ -89,19 +87,16 @@ function setLocation(lat, lon){
 	var minLongitude = longi - range;
 	var maxLongitude = longi + range;
 	geoloc = 'minLatitude='+minLatitude.toFixed(6)+'&maxLatitude='+maxLatitude.toFixed(6)+'&minLongitude='+minLongitude.toFixed(6)+'&maxLongitude='+maxLongitude.toFixed(6);
-	
+	options.path = '/api/v1/submissions?'+geoloc;
 }
-
-//setInterval( catchthemall, 1000*60*3);
 
 class PingController extends TelegramBaseController {
     /**
      * @param {Scope} $
      */
 	
-    pingHandler($) {
-		word = 'abc';		
-        $.sendMessage(word);
+    pingHandler($) {		
+        $.sendMessage('I AM ALIVE!');
     }
 	startScan($){
 		console.log('start');
@@ -130,10 +125,12 @@ class PingController extends TelegramBaseController {
 		switch(favPlace){
 			case "cck":
 				geoloc = cckloc;
+				options.path = '/api/v1/submissions?'+geoloc;
 				$.sendMessage('Location set to CCK');
 				break;
 			case "bmc":
 				geoloc = bmcloc;
+				options.path = '/api/v1/submissions?'+geoloc;
 				$.sendMessage('Location set to BMC');				
 				break;
 			default:
