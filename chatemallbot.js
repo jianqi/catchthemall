@@ -17,52 +17,85 @@ var POKEDEX = JSON.parse(fs.readFileSync('pokemon.txt','utf8'));
 
 //var geoloc = 'minLatitude=1.379938212500962&maxLatitude=1.3989012175086133&minLongitude=103.72072219848633&maxLongitude=103.76964569091797';
 
-var cckloc = 'minLatitude=1.381397&maxLatitude=1.396885&minLongitude=103.739545&maxLongitude=103.753460';
-var bmcloc = 'minLatitude=1.281957&maxLatitude=1.284551&minLongitude=103.813580&maxLongitude=103.820331';
+var cckloc = {minLat : 1.381397 , maxLat : 1.396885, minLng : 103.739545, maxLng : 103.753460};//'minLatitude=1.381397&maxLatitude=1.396885&minLongitude=103.739545&maxLongitude=103.753460';
+var bmcloc = {minLat : 1.281957 , maxLat : 1.284551, minLng : 103.813580, maxLng : 103.820331};//'minLatitude=1.281957&maxLatitude=1.284551&minLongitude=103.813580&maxLongitude=103.820331';
+var minLat = 1.381397;
+var maxLat = 1.396885;
+var minLng = 103.739545;
+var maxLng = 103.753460;
+var geoloc = cckloc;
 
-var geoloc = bmcloc;
+// 0.005 degree = 555m
 var range = 0.005;
-
+var basePath = '/query2.php?since=0&mons=';
+//pokeradar settings
 var options = {
   host: '50.112.198.230',
   path: '/api/v1/submissions?'+geoloc,
   method:'GET'
 };
-var rarePokemon = [2,3,5,6,8,9,26,31,34,36,38,40,45,51,53,57,59,62,64,65,67,68,71,75,76,78,82,86,87,89,91,93,94,95,97,101,103,106,107,112,113,131,134,135,136,137,140,141,142,143,148,149];
+
+var rarePokemon = [2,3,4,5,6,8,9,26,31,34,36,38,40,45,51,53,57,59,62,64,65,67,68,71,75,76,78,82,86,87,89,91,93,94,95,97,101,103,106,107,112,113,131,134,135,136,137,140,141,142,143,148,149];
 rarePokemon = _.sortBy(rarePokemon, function(num) {return num;});
 var commonPokemon = [16,17,19,20,13,14,10,11,21,23,29,32,41,46,48,69,72,79,84,98,129,116,120];
 var sentList = [];
-// 0.005 degree = 555m
+
+var timenow
+//sgpokemap settings
+var options = {
+  host: 'sgpokemap.com',
+  path: basePath+rarePokemon.join(','),
+  method:'GET',
+  headers: {
+    accept: '*/*',
+	referer: 'https://sgpokemap.com/'
+	}
+};
+
 
 function handleData(response){
-	console.log(options.path + ' - received response at : ' + moment().tz("Asia/Singapore").format('LTS') );
+	console.log('received response at : ' + moment().tz("Asia/Singapore").format('LTS') );
 	var str = '';
 	//another chunk of data has been recieved, so append it to `str`
-  response.on('data', function (chunk) {
-	 
+  response.on('data', function (chunk) {	 
     str += chunk;
   });
 
   
   //the whole response has been recieved, so we just print it out here
   response.on('end', function () {
-	var pokeList = JSON.parse(str).data;
+	var pokeList = JSON.parse(str).pokemons;
 	console.log(pokeList.length);
 	
+	/* pokeradar code
 	var removedNoise = _.filter(pokeList, function(pokemon){
 		//if(_.contains(commonPokemon, pokemon.pokemonId)) return false;		
 		if((pokemon.latitude+"").length>8) return false;
 		if(pokemon.trainerName == '(Poke Radar Prediction)' && _.contains(rarePokemon, pokemon.pokemonId)  && !_.contains(sentList, pokemon.id)) return true;
 		//return true;
 	});
+	*/
 	
+	// we only want pokemon in our proximity	
+	var removedNoise = _.filter(pokeList, function(pokemon){
+		/*
+		{
+            "pokemon_id": "1",
+            "lat": "1.292115",
+            "lng": "103.766255",
+            "despawn": "1473777662"
+        },
+		*/
+		if(_.contains(sentList, pokemon.pokemon_id+'-'+pokemon.despawn)) return false;
+		if(Number(pokemon.lat) >= geoloc.minLat && Number(pokemon.lat) <= geoloc.maxLat && Number(pokemon.lng) >= geoloc.minLng && Number(pokemon.lng) <= geoloc.maxLng) return true;
+	});
 	console.log(removedNoise.length);
 	
 	_.each(removedNoise, function(pokemon){		
-		sentList.push(pokemon.id);
-		var time = moment.unix(Number(pokemon.created)).tz('Asia/Singapore').add(15,'m').format('LTS');		
-		var googlelocation = 'https://www.google.com.sg/maps/place/'+pokemon.latitude+','+pokemon.longitude;
-		tg.api.sendMessage(chatId,POKEDEX[Number(pokemon.pokemonId)-1].name + " at " +googlelocation+" until "+ time );
+		sentList.push(pokemon.pokemon_id+'-'+pokemon.despawn);
+		var time = moment.unix(Number(pokemon.despawn)).tz('Asia/Singapore').format('LTS');		
+		var googlelocation = 'https://www.google.com.sg/maps/place/'+pokemon.lat+','+pokemon.lng;
+		tg.api.sendMessage(chatId,POKEDEX[Number(pokemon.pokemon_id)-1].name + " at " +googlelocation+" until "+ time );
 	});
 		
 		
@@ -82,14 +115,18 @@ function setLocation(lat, lon){
 	
 	var lat = Number(lat);
 	var longi = Number(lon);
-	var minLatitude = lat - range;
-	var maxLatitude = lat + range;
-	var minLongitude = longi - range;
-	var maxLongitude = longi + range;
-	geoloc = 'minLatitude='+minLatitude.toFixed(6)+'&maxLatitude='+maxLatitude.toFixed(6)+'&minLongitude='+minLongitude.toFixed(6)+'&maxLongitude='+maxLongitude.toFixed(6);
-	options.path = '/api/v1/submissions?'+geoloc;
+	geoloc = {minLat : lat - range,
+				maxLat : lat + range,
+				minLng : longi - range,
+		maxLng : longi + range};
+	
+	tg.api.sendMessage(chatId,'location set to '+JSON.stringify(geoloc));
+	//geoloc = 'minLatitude='+minLatitude.toFixed(6)+'&maxLatitude='+maxLatitude.toFixed(6)+'&minLongitude='+minLongitude.toFixed(6)+'&maxLongitude='+maxLongitude.toFixed(6);
+	//options.path = '/api/v1/submissions?'+geoloc;
 }
-
+function refreshPath(){
+	options.path = basePath+rarePokemon.join(',');
+}
 class PingController extends TelegramBaseController {
     /**
      * @param {Scope} $
@@ -124,13 +161,15 @@ class PingController extends TelegramBaseController {
 		
 		switch(favPlace){
 			case "cck":
+			console.log(cckloc);
 				geoloc = cckloc;
-				options.path = '/api/v1/submissions?'+geoloc;
+				console.log(geoloc);
+				//options.path = '/api/v1/submissions?'+geoloc;
 				$.sendMessage('Location set to CCK');
 				break;
 			case "bmc":
 				geoloc = bmcloc;
-				options.path = '/api/v1/submissions?'+geoloc;
+				//options.path = '/api/v1/submissions?'+geoloc;
 				$.sendMessage('Location set to BMC');				
 				break;
 			default:
@@ -149,21 +188,23 @@ class PingController extends TelegramBaseController {
 	addPokemonById($){
 		var id = Number($.query.id);
 		if(_.contains(rarePokemon, id)){
-			$.sendMessage(id + ' existed in list');
+			$.sendMessage(id +': '+POKEDEX[id-1].name+ ' existed in list');
 		}else{
 			rarePokemon.push(id);
 			rarePokemon = _.sortBy(rarePokemon, function(num) {return num;});
-			$.sendMessage(id + ' successfully added');
+			refreshPath()
+			$.sendMessage(id +': '+POKEDEX[id-1].name+ ' successfully added');
 		}
 	}
 	deletePokemonById($){
 		var id = Number($.query.id);
 		var index = rarePokemon.indexOf(id);
 		if(index == -1){
-			$.sendMessage(id + ' does not exist in list');
+			$.sendMessage(id +': '+POKEDEX[id-1].name+ ' does not exist in list');
 		}else{
 			rarePokemon.splice(index, 1);			
-			$.sendMessage(id + ' successfully deleted');
+			refreshPath()
+			$.sendMessage(id +': '+POKEDEX[id-1].name+ ' successfully deleted');			
 		}
 	}
 	setRange($){
@@ -173,6 +214,11 @@ class PingController extends TelegramBaseController {
 		$.sendMessage(meter + ' m = '+degree+' degree');
 		range = degree;
 		
+	}
+	clearsent($){
+		var size = sentList.length;
+		sentList = [];
+		$.sendMessage(size + ' items in sentList cleared');
 	}
     get routes() {
         return {
@@ -184,10 +230,11 @@ class PingController extends TelegramBaseController {
 			'/list': 'printFilterList',
 			'/add :id': 'addPokemonById',
 			'/delete :id' : 'deletePokemonById',
-			'/setRange :range' : 'setRange'
+			'/setRange :range' : 'setRange',
+			'/clearsent' : 'clearsent'
         }
     }
 }
 
 tg.router
-    .when(['/ping','/start','/stop','/location :lat :lon','/fav :place','/list','/add :id','/delete :id','/setRange :range'], new PingController())
+    .when(['/ping','/start','/stop','/location :lat :lon','/fav :place','/list','/add :id','/delete :id','/setRange :range','/clearsent'], new PingController())
