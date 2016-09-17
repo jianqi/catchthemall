@@ -54,7 +54,7 @@ var options = {
 
 
 function handleData(response){
-	console.log('received response at : ' + moment().tz("Asia/Singapore").format('LTS') );
+	//console.log('received response at : ' + moment().tz("Asia/Singapore").format('LTS') );
 	var str = '';
 	//another chunk of data has been recieved, so append it to `str`
   response.on('data', function (chunk) {	 
@@ -65,7 +65,7 @@ function handleData(response){
   //the whole response has been recieved, so we just print it out here
   response.on('end', function () {
 	var pokeList = JSON.parse(str).pokemons;
-	console.log(pokeList.length);
+	//console.log(pokeList.length);
 	
 	/* pokeradar code
 	var removedNoise = _.filter(pokeList, function(pokemon){
@@ -89,7 +89,7 @@ function handleData(response){
 		if(_.contains(sentList, pokemon.pokemon_id+'-'+pokemon.despawn)) return false;
 		if(Number(pokemon.lat) >= geoloc.minLat && Number(pokemon.lat) <= geoloc.maxLat && Number(pokemon.lng) >= geoloc.minLng && Number(pokemon.lng) <= geoloc.maxLng) return true;
 	});
-	console.log(removedNoise.length);
+	//console.log(removedNoise.length);
 	
 	_.each(removedNoise, function(pokemon){		
 		sentList.push(pokemon.pokemon_id+'-'+pokemon.despawn);
