@@ -1,9 +1,9 @@
-# catchthemall
+# CatchThemAll
 A prototype Telegram Pokemon scanner bot with lots of room for improvement (Too many hardcode).
 
-The bot polls sgpokemap.com every minute(hardcoded) and alerts if rare pokemon appears.
+The bot polls sgpokemap.com every minute(hardcoded) and sends a telegram message if rare pokemon appears.
 
-Create Telegram Bot
+##Create Telegram Bot
 https://core.telegram.org/bots#3-how-do-i-create-a-bot
 
 ##Commands
