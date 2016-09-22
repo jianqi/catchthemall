@@ -1,6 +1,11 @@
 # catchthemall
-Telegram Pokemon scanner bot
+A prototype Telegram Pokemon scanner bot
 
-A telegram bot that polls from pokemonradargo.com every minute and alerts you if rare pokemon appears.
+A telegram bot that poll sgpokemap.com every minute and alerts if rare pokemon appears.
 
-The bot filters pokemon found by other trainers.
+Create Telegram Bot
+https://core.telegram.org/bots#3-how-do-i-create-a-bot
+
+Commands
+
+
