@@ -7,7 +7,8 @@ Create Telegram Bot
 https://core.telegram.org/bots#3-how-do-i-create-a-bot
 
 ##Commands
-
+|Commands|Description|
+|---:|---:|
 |/ping   | check service status|
 |/start  | start 1 min poll interval|
 |/stop   | stop interval|
