@@ -6,8 +6,8 @@ The bot polls sgpokemap.com every minute(hardcoded) and alerts if rare pokemon a
 Create Telegram Bot
 https://core.telegram.org/bots#3-how-do-i-create-a-bot
 
-|Commands|
-| ---:|
+##Commands
+
 |/ping   | check service status|
 |/start  | start 1 min poll interval|
 |/stop   | stop interval|
