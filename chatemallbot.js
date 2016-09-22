@@ -3,7 +3,7 @@ const Telegram = require('telegram-node-bot')
 const TelegramBaseController = Telegram.TelegramBaseController
 const tg = new Telegram.Telegram(process.env.TELEGRAM_API_TOKEN)
 var timerobj;
-var http = require('http');
+var https = require('https');
 var _ = require('underscore');
 var fs = require('fs');
 var moment = require('moment-timezone');
@@ -27,7 +27,7 @@ var geoloc = cckloc;
 
 // 0.005 degree = 555m
 var range = 0.005;
-var basePath = '/query2.php?since=0&mons=';
+var basePath = '/query3.php?since=0&mons=';
 //pokeradar settings
 var options = {
   host: '50.112.198.230',
@@ -47,23 +47,29 @@ var options = {
   path: basePath+rarePokemon.join(','),
   method:'GET',
   headers: {
-    accept: '*/*',
-	referer: 'https://sgpokemap.com/'
+    'accept': '*/*',
+	'referer': 'https://sgpokemap.com/',		
+	'x-requested-with':'XMLHttpRequest'
 	}
 };
 
 
 function handleData(response){
+	
 	//console.log('received response at : ' + moment().tz("Asia/Singapore").format('LTS') );
 	var str = '';
 	//another chunk of data has been recieved, so append it to `str`
-  response.on('data', function (chunk) {	 
-    str += chunk;
+	//console.log('in handle data');
+	
+  response.on('data', function (chunk) {
+	  //console.log('chunk   : ' + chunk);
+		str += chunk;	
   });
 
   
   //the whole response has been recieved, so we just print it out here
   response.on('end', function () {
+	//console.log('end');  
 	var pokeList = JSON.parse(str).pokemons;
 	//console.log(pokeList.length);
 	
@@ -104,7 +110,8 @@ function handleData(response){
 };
 function catchthemall(){
 	try{
-		http.request(options, handleData).end();
+		
+		https.request(options, handleData).end();
 	}catch(err){
 		console.log(err);
 	}
